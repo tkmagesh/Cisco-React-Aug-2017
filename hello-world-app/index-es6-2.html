@@ -32,11 +32,101 @@
 				)
 		    }
 		}
-		
 
-		
+		{/*
+		class Calculator extends React.Component{
+			state = {
+				result : 0
+			}
 
-		ReactDOM.render(<HelloWorld></HelloWorld>, 
+			onBtnAddClick(){
+				var n1 = parseInt(this.refs.txtNumber1.value),
+					n2 = parseInt(this.refs.txtNumber2.value);
+				var result = n1 + n2;
+				this.setState({result : result});
+			}
+			onBtnSubtractClick(){
+				var n1 = parseInt(this.refs.txtNumber1.value),
+					n2 = parseInt(this.refs.txtNumber2.value);
+				var result = n1 - n2;
+				this.setState({result : result});
+			}
+			onBtnMultiplyClick(){
+				var n1 = parseInt(this.refs.txtNumber1.value),
+					n2 = parseInt(this.refs.txtNumber2.value);
+				var result = n1 * n2;
+				this.setState({result : result});
+			}
+			onBtnDivideClick(){
+				var n1 = parseInt(this.refs.txtNumber1.value),
+					n2 = parseInt(this.refs.txtNumber2.value);
+				var result = n1 / n2;
+				this.setState({result : result});
+			}
+			render(){
+				return(
+					<div>
+						<h1>Calculator</h1>
+						<hr />
+						<input type="number" ref="txtNumber1" />
+						<input type="number" ref="txtNumber2" />
+						<input type="button" value="Add" onClick={this.onBtnAddClick.bind(this)}/>
+						<input type="button" value="Subtract" onClick={this.onBtnSubtractClick.bind(this)}/>
+						<input type="button" value="Multiply" onClick={this.onBtnMultiplyClick.bind(this)}/>
+						<input type="button" value="Divide" onClick={this.onBtnDivideClick.bind(this)}/>
+						<div>{this.state.result}</div>
+					</div>
+				)
+			}
+		}
+		*/}
+		
+		class Calculator extends React.Component{
+			state = {
+				result : 0
+			}
+
+			onBtnClick(operator){
+				var n1 = parseInt(this.refs.txtNumber1.value),
+					n2 = parseInt(this.refs.txtNumber2.value);
+				var result = 0;
+				switch(operator){
+					case '+' :
+						result = n1 + n2;
+						break;
+					case '-' :
+						result = n1 - n2;
+						break;
+					case '*' :
+						result = n1 * n2;
+						break;
+					case '/' :
+						result = n1 / n2;
+						break;
+				}
+				this.setState({result : result});
+			}
+			
+			render(){
+				return(
+					<div>
+						<h1>Calculator</h1>
+						<hr />
+						<input type="number" ref="txtNumber1" />
+						<input type="number" ref="txtNumber2" />
+						<input type="button" value="Add" onClick={this.onBtnClick.bind(this, '+')}/>
+						<input type="button" value="Subtract" onClick={this.onBtnClick.bind(this, '-')}/>
+						<input type="button" value="Multiply" onClick={this.onBtnClick.bind(this, '*')}/>
+						<input type="button" value="Divide" onClick={this.onBtnClick.bind(this, '/')}/>
+						<div>{this.state.result}</div>
+					</div>
+				)
+			}
+		}
+		ReactDOM.render(<div>
+			<HelloWorld></HelloWorld>
+			<Calculator></Calculator>
+			</div>, 
 				document.getElementById('content'));
 	</script>
 </head>
