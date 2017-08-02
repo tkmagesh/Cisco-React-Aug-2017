@@ -8,10 +8,8 @@
 	<script src="babel.min.js"></script>
 
 	<script type="text/babel">
-		var HelloWorld = React.createClass({
-			render : function(){
-				/*return React.createElement('div', null, 
-					React.createElement('h1', null, this.props.message));*/
+		class HelloWorld extends React.Component{
+			render(){
 				return (
 					<div>
 						<h1>
@@ -20,26 +18,18 @@
 					</div>
 				)
 		    }
-		});
+		}
 		function onBtnRenderClick(){
 			var username = prompt('Enter the name :');
 			var greetMessage = 'Hello ' + username + ', Have a nice day!';
-			/*ReactDOM.render(React.createElement(HelloWorld, {message : greetMessage}, null), 
-				document.getElementById('content'));*/
-
+			
 			ReactDOM.render(<HelloWorld message={greetMessage}></HelloWorld>, 
 				document.getElementById('content'));
 		}
 
 		document.getElementById('btnRender').addEventListener('click', onBtnRenderClick);
-		
-		/*
-		window.addEventListener('DOMContentLoaded', init);
 
-		function init(){
-			document.getElementById('btnRender').addEventListener('click', onBtnRenderClick);
-		}
-		*/
+		
 	</script>
 </head>
 <body>
