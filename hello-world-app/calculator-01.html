@@ -8,39 +8,57 @@
 	<script src="babel.min.js"></script>
 
 	<script type="text/babel">
+		class EventEmitter{
+			_subscribers = [];
+			subscribe(callback){
+				this._subscribers.push(callback);
+			}
+			trigger(){
+				this._subscribers.forEach(subscriber => subscriber());
+			}
+		}
 
-		class CalculatorModel{
+		class CalculatorModel extends EventEmitter{
 			number1 = 0;
 			number2 = 0;
-			result = 0;
+			_result = 0;
 
-			subscriber = function(){};
+			get result(){
+				return this._result;
+			}
+			set result(value){
+				this._result = value;
+				this.trigger();
+			}
 			
 			add(){
 				this.result = this.number1 + this.number2;
-				this.subscriber();
 			}
 			subtract(){
 				this.result = this.number1 - this.number2;
-				this.subscriber();
 			}
 			multiply(){
 				this.result = this.number1 * this.number2;
-				this.subscriber();
 			}
 			divide(){
 				this.result = this.number1 / this.number2;
-				this.subscriber();
 			}
 		}
 		
 		class Calculator extends React.Component{
 			
+			
+			onTxtNumber1Change(evt){
+				this.props.model.number1 = parseInt(evt.target.value);
+			}
+			onTxtNumber2Change(evt){
+				this.props.model.number2 = parseInt(evt.target.value);
+			}
 			onBtnClick(operator){
 				var model = this.props.model;
 
-				model.number1 = parseInt(this.refs.txtNumber1.value),
-				model.number2 = parseInt(this.refs.txtNumber2.value);
+				
+				
 				
 				switch(operator){
 					case '+' :
@@ -60,29 +78,42 @@
 			}
 			
 			render(){
+				var model = this.props.model;
 				return(
 					<div>
 						<h1>Calculator</h1>
 						<hr />
-						<input type="number" ref="txtNumber1" />
-						<input type="number" ref="txtNumber2" />
+						<input type="number" ref="txtNumber1" defaultValue={model.number1} onChange={this.onTxtNumber1Change.bind(this)}/>
+						<input type="number" ref="txtNumber2" defaultValue={model.number2} onChange={this.onTxtNumber2Change.bind(this)}/>
 						<input type="button" value="Add" onClick={this.onBtnClick.bind(this, '+')}/>
 						<input type="button" value="Subtract" onClick={this.onBtnClick.bind(this, '-')}/>
 						<input type="button" value="Multiply" onClick={this.onBtnClick.bind(this, '*')}/>
 						<input type="button" value="Divide" onClick={this.onBtnClick.bind(this, '/')}/>
-						<div>{this.props.model.result}</div>
+						<CalculatorResult data={model.result}></CalculatorResult>
 					</div>
 				)
 			}
 		}
+		class CalculatorResult extends React.Component{
+			render(){
+				
+				var styleProps = {
+					color : this.props.data >= 0 ? 'green' : 'red'
+				}
+				return(
+					<div style={styleProps}>{this.props.data}</div>
+				)
+			}
+		}
 		window.model = new CalculatorModel();
-
+		model.number1 = 100;
+		model.number2 = 200;
 		function renderApp(){
 			ReactDOM.render(<Calculator model={model}></Calculator>,
 				document.getElementById('content'));
 		}
 		renderApp();
-		model.subscriber = renderApp;
+		model.subscribe(renderApp);
 	</script>
 </head>
 <body>
