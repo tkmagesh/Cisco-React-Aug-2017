@@ -8,8 +8,6 @@ var SM = (function(){
 
 		let _callbacks = [];
 
-		
-
 		function getState(){
 			return _state;
 		}
