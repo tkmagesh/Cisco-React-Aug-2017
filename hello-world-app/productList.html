@@ -25,6 +25,11 @@
 				this.trigger();
 			}
 
+			remove(index){
+				this._list.splice(index,1);
+				this.trigger();
+			}
+
 			get list(){
 				return this._list;
 			}
@@ -34,6 +39,9 @@
 			onAddNewClick(){
 				var product = this.refs.txtProductName.value;
 				this.props.model.add(product);
+			}
+			onRemoveClick(index){
+				this.props.model.remove(index);
 			}
 			render(){
 				var model = this.props.model,
@@ -57,7 +65,9 @@
 					return <li key={index}>{product}</li>
 				});
 				*/
-				var productItems = list.map((product, index) => (<li key={index}>{product}</li>));
+				var productItems = list.map((product, index) => (
+					<ProductItem key={index} model={product} onRemove={this.onRemoveClick.bind(this, index)}></ProductItem>
+				));
 
 				return (
 					<div>
@@ -70,6 +80,19 @@
 						</ol>
 					</div>
 				)
+			}
+		}
+
+		class ProductItem extends React.Component{
+			render(){
+				console.dir(this);
+				var product = this.props.model;
+				return (
+					<li>
+						<span>{product}</span>
+						<input type="button" value="Remove" onClick={this.props.onRemove}/>
+					</li>
+				);
 			}
 		}
 
