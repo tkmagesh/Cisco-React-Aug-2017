@@ -3,18 +3,89 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Product List</title>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="babel.min.js"></script>
+
+	<script type="text/babel">
+		class EventEmitter{
+			_subscribers = [];
+			subscribe(callback){
+				this._subscribers.push(callback);
+			}
+			trigger(){
+				this._subscribers.forEach(subscriber => subscriber());
+			}
+		}
+		class ProductsListModel extends EventEmitter{
+			_list = [];
+
+			add(product){
+				this._list.push(product);
+				this.trigger();
+			}
+
+			get list(){
+				return this._list;
+			}
+		}
+
+		class ProductsList extends React.Component{
+			onAddNewClick(){
+				var product = this.refs.txtProductName.value;
+				this.props.model.add(product);
+			}
+			render(){
+				var model = this.props.model,
+					list = model.list;
+
+				/*
+				var productItems = [];
+
+				productItems.push(<li key="1">Product - 1</li>);
+				productItems.push(<li key="2">Product - 2</li>);
+				productItems.push(<li key="3">Product - 3</li>);*/
+
+				/*
+				var productItems = [];
+				for(var index=0; index < list.length; index++){
+					productItems.push(<li key={index}>{list[index]}</li>)
+				}
+				*/
+
+				/*var productItems = list.map(function(product, index){
+					return <li key={index}>{product}</li>
+				});
+				*/
+				var productItems = list.map((product, index) => (<li key={index}>{product}</li>));
+
+				return (
+					<div>
+						<label>Product Name</label>
+						<input type="text" ref="txtProductName" />
+						<input type="button" value="Add New" onClick={this.onAddNewClick.bind(this)}/>
+						<div>{list.length}</div>
+						<ol>
+							{productItems}
+						</ol>
+					</div>
+				)
+			}
+		}
+
+		var products = new ProductsListModel();
+
+		function renderApp(){
+			ReactDOM.render(<ProductsList model={products}></ProductsList>,
+				document.getElementById('content'));
+		}
+		renderApp();
+		products.subscribe(renderApp);
+	</script>
 </head>
 <body>
 	<h1>Product List</h1>
 	<hr>
-	<label for="">Product Name</label>
-	<input type="text" name="" id="">
-	<input type="button" value="Add New">
-	<div>[Product Count]</div>
-	<ol>
-		<li>Product - 1</li>
-		<li>Product - 2</li>
-		<li>Product - 3</li>
-	</ol>
+	<div id="content"></div>
 </body>
 </html>
