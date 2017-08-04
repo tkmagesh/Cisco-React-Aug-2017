@@ -107,14 +107,15 @@
 		let actionCreators = bindActionCreators(store.dispatch, bugActionCreators);
 
 
-		class BugsTracker extends React.Component{
+		class BugTracker extends React.Component{
 			render(){
-				let { bugs, removeClosed, toggle, addNew } = this.props;
+				let { bugs,  removeClosed, toggle, addNew } = this.props,
+					list_data = {bugs, toggle, removeClosed };
 				return (
 					<div>
 						<BugStats bugs={bugs}></BugStats>
 						<BugEdit addNew={addNew}></BugEdit>
-						<BugList {bugs, removeClosed, toggle}></BugList>
+						<BugList {...list_data}></BugList>
 					</div>
 				);
 			}
@@ -135,11 +136,10 @@
 				)
 			}
 		}
-		
-		let BugList = ({props}) => {
-			let {bugs, removeClosed, toggle } = props;
+
+		let BugList = ({bugs, removeClosed, toggle }) => {
 			let bugItems = bugs.map((bug, index) => (
-				<BugItem key={index} model={bug} onToggle={toggle.bind(this, bug)}></BugItem>
+				<BugItem key={index} bug={bug} toggle={toggle.bind(this, bug)}></BugItem>
 			));
 			return (
 				<section className="list">
@@ -164,12 +164,12 @@
 		}
 		
 
-		let BugItem = ({props}) => {
+		let BugItem = (props) => {
 			let { bug, toggle } = props;
-			let bugClass = bug.isClosed ? 'closed' : '';
+			let bugClass = bug.isClosed ? 'bugname closed' : 'bugname';
 			return (
 				<li>
-					<span className="bugname {bugClass}" onClick={toggle} >{bug.name}</span>
+					<span className={bugClass} onClick={toggle} >{bug.name}</span>
 					<div className="datetime">[Created At]</div>
 					<i>[{bug.isClosed.toString()}]</i>
 				</li>

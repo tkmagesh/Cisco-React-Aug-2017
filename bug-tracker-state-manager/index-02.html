@@ -122,10 +122,11 @@
 			}*/
 
 			render(){
+				console.log(this.props);
 				let { bugs, removeClosed, toggle } = this.props;
 
 				let bugItems = bugs.map((bug, index) => (
-					<BugItem key={index} model={bug} onToggle={toggle.bind(this, bug)}></BugItem>
+					<BugItem key={index} bug={bug} onToggle={toggle.bind(this, bug)}></BugItem>
 				));
 
 				return (
@@ -174,7 +175,8 @@
 		}
 		
 
-		let BugItem = ({props}) => {
+		let BugItem = (props) => {
+			console.log(props);
 			let { bug, toggle } = props;
 			let bugClass = bug.isClosed ? 'closed' : '';
 			return (
@@ -190,8 +192,9 @@
 		
 
 		function renderApp(){
-			let state = store.getState();
-			ReactDOM.render(<BugsList bugs={state} {...actionCreators} ></BugsList>,
+			let bugs = store.getState();
+			let data = {bugs, ...actionCreators};
+			ReactDOM.render(<BugsList {...data} ></BugsList>,
 				document.getElementById('content'));
 		}
 		renderApp();
