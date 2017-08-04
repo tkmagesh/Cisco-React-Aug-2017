@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import BugItem from './BugItem';
 
 let BugList = ({bugs, removeClosed, toggle }) => {
