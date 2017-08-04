@@ -1,6 +1,8 @@
 function bugsReducer(currentState = [], action){
 	let { type : actionType, payload } = action;
-
+	if (actionType === 'INIT_DATA'){
+		return [...payload];
+	}
 	if (actionType === 'ADD_NEW'){
 		let newBug = {
 			name : payload,
