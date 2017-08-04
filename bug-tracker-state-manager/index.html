@@ -68,8 +68,13 @@
 				return [...currentState, newBug];
 			}
 			if (actionType === 'TOGGLE'){
-				let bugToToggle = payload;
-				return currentState.map(bug => bug === bugToToggle ? {...bugToToggle, isClosed : !bugToToggle.isClosed} : bug)
+				let bugToToggle = payload,
+					toggledBug = {...bugToToggle, isClosed : !bugToToggle.isClosed};
+				return currentState.map(bug => 
+					bug === bugToToggle ? toggledBug : bug);
+			}
+			if (actionType === 'REMOVE_CLOSED'){
+				return currentState.filter(bug => !bug.isClosed);
 			}
 			return currentState;
 		}
@@ -89,6 +94,11 @@
 				 	bugToToggle = bug,
 				 	toggleAction = { type : 'TOGGLE', payload : bugToToggle};
 				store.dispatch(toggleAction);	
+			}
+			onRemoveClosedClick(){
+				let store = this.props.store,
+					removeClosedAction = { type : 'REMOVE_CLOSED'};
+				store.dispatch(removeClosedAction);
 			}
 			render(){
 				let store = this.props.store,
@@ -114,7 +124,7 @@
 								<ol>
 									{bugItems}
 								</ol>
-								<input type="button" value="Remove Closed" />
+								<input type="button" value="Remove Closed" onClick={this.onRemoveClosedClick.bind(this)}/>
 							</section>
 						</section>
 					</div>
@@ -128,10 +138,14 @@
 			}*/
 			render(){
 				let bug = this.props.model;
+				let bugNameItem = bug.isClosed ? 
+					(<span className="bugname closed" onClick={this.props.onToggle} >{bug.name}</span>) 
+					:(<span className="bugname" onClick={this.props.onToggle} >{bug.name}</span>);
+
 				return (
 					<li>
 						{/*<span className="bugname" onClick={this.onBugNameClick.bind(this)} >{bug.name}</span>*/}
-						<span className="bugname" onClick={this.props.onToggle} >{bug.name}</span>
+						{bugNameItem}
 						<div className="datetime">[Created At]</div>
 						<i>[{bug.isClosed.toString()}]</i>
 					</li>
