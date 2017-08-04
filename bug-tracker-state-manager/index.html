@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Bug Tracker</title>
+	<script type="text/usecases">
+		1. Add new bugs
+		2. List the bugs
+		3. Toggle the 'closed' status of ths bugs
+		4. Remove closed bugs
+		5. Display stats
+		6. Persit the bugs in localStorage
+		7. Display 'createdAt'
+		8. Persist the bugs in the server
+		9. Make the bugs accessible using unique urls
+	</script>
+	<style>
+		body{
+			margin-left: 50px;
+		}
+		.closed{
+			color : red;
+			text-decoration: line-through;
+			font-style: italic;
+			font-weight: bold;
+		}
+		section{
+			margin-bottom: 10px;
+		}
+		ol{
+			list-style: none;
+			margin-bottom: 10px;
+			-webkit-padding-start : 0px;
+			width: 500px;
+		}
+		.stats, .bugname{
+			font-size: 22pt;
+		}
+		.bugname{
+			cursor: pointer;
+		}
+		li{
+			margin-bottom: 10px;
+			border: 1px solid gray;
+			background-color: #e7e7e7;
+			padding: 10px;
+			border-radius: 5px;
+		}
+		.datetime{
+			font-style: italic;
+		}
+	</style>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="babel.min.js"></script>
+	<script src="state-manager.js"></script>
+
+	<script type="text/babel">
+		//reducer
+		function bugsReducer(currentState = [], action){
+			let { type : actionType, payload } = action;
+
+			if (actionType === 'ADD_NEW'){
+				let newBug = {
+					name : payload,
+					isClosed : false
+				}
+				return [...currentState, newBug];
+			}
+			if (actionType === 'TOGGLE'){
+				let bugToToggle = payload;
+				return currentState.map(bug => bug === bugToToggle ? {...bugToToggle, isClosed : !bugToToggle.isClosed} : bug)
+			}
+			return currentState;
+		}
+		//store
+		window.store = SM.createStore(bugsReducer);
+
+		class BugsList extends React.Component{
+			onAddNewClick(){
+				let store = this.props.store,
+				 	bugName = this.refs.txtBugName.value,
+				 	addNewAction = { type : 'ADD_NEW', payload : bugName};
+				store.dispatch(addNewAction);
+			}
+			
+			onToggle(bug){
+				let store = this.props.store,
+				 	bugToToggle = bug,
+				 	toggleAction = { type : 'TOGGLE', payload : bugToToggle};
+				store.dispatch(toggleAction);	
+			}
+			render(){
+				let store = this.props.store,
+					list = store.getState();
+
+				
+				let bugItems = list.map((bug, index) => (
+					<BugItem key={index} model={bug} onToggle={this.onToggle.bind(this, bug)}></BugItem>
+				));
+
+				return (
+					<div>
+						<section className="stats">
+							<span className="closed">2</span>
+							<span>/</span>
+							<span>{list.length}</span>
+						</section>
+						<section className="edit">
+							<label htmlFor="">New Bug :</label>
+							<input type="text" ref="txtBugName" />
+							<input type="button" value="Add New" onClick={this.onAddNewClick.bind(this)} />
+							<section className="list">
+								<ol>
+									{bugItems}
+								</ol>
+								<input type="button" value="Remove Closed" />
+							</section>
+						</section>
+					</div>
+				)
+			}
+		}
+
+		class BugItem extends React.Component{
+			/*onBugNameClick() {
+				this.props.onToggle();
+			}*/
+			render(){
+				let bug = this.props.model;
+				return (
+					<li>
+						{/*<span className="bugname" onClick={this.onBugNameClick.bind(this)} >{bug.name}</span>*/}
+						<span className="bugname" onClick={this.props.onToggle} >{bug.name}</span>
+						<div className="datetime">[Created At]</div>
+						<i>[{bug.isClosed.toString()}]</i>
+					</li>
+				);
+			}
+		}
+
+		
+
+		function renderApp(){
+			ReactDOM.render(<BugsList store={store}></BugsList>,
+				document.getElementById('content'));
+		}
+		renderApp();
+		store.subscribe(renderApp);
+	</script>
+</head>
+<body>
+	<h1>Bug Tracker</h1>
+	<hr>
+	<div id="content"></div>
+</body>
+</html>
