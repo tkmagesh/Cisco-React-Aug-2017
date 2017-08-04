@@ -81,38 +81,56 @@
 		//store
 		window.store = SM.createStore(bugsReducer);
 
+		function bindActionCreators(dispatch, actionCreators){
+			var result = {}
+			for(let key in actionCreators){
+				result[key] = function(){
+					dispatch(actionCreators[key].apply(undefined, arguments))
+				}
+			}
+			return result;
+		}
+
+		let bugActionCreators = {
+			addNew : function(bugName){
+				return { type : 'ADD_NEW', payload : bugName};
+			},
+			
+			toggle : function(bug){
+				return { type : 'TOGGLE', payload : bug};
+			},
+			removeClosed : function(){
+				return { type : 'REMOVE_CLOSED'};
+			}
+		};
 		
+		let actionCreators = bindActionCreators(store.dispatch, bugActionCreators);
+
+
 		class BugsList extends React.Component{
+
 			onAddNewClick(){
-				let store = this.props.store,
-				 	bugName = this.refs.txtBugName.value,
-				 	addNewAction = { type : 'ADD_NEW', payload : bugName};
-				store.dispatch(addNewAction);
+				let bugName = this.refs.txtBugName.value;
+				this.props.addNew(bugName);
 			}
 			
-			onToggle(bug){
-				let store = this.props.store,
-				 	bugToToggle = bug,
-				 	toggleAction = { type : 'TOGGLE', payload : bugToToggle};
-				store.dispatch(toggleAction);	
+			/*onToggle(bug){
+				this.props.toggle(bug);				
 			}
 			onRemoveClosedClick(){
-				let store = this.props.store,
-					removeClosedAction = { type : 'REMOVE_CLOSED'};
-				store.dispatch(removeClosedAction);
-			}
-			render(){
-				let store = this.props.store,
-					list = store.getState();
+				this.props.removeClosed();
+			}*/
 
-				
-				let bugItems = list.map((bug, index) => (
-					<BugItem key={index} model={bug} onToggle={this.onToggle.bind(this, bug)}></BugItem>
+			render(){
+				let { bugs, removeClosed, toggle } = this.props;
+
+				let bugItems = bugs.map((bug, index) => (
+					<BugItem key={index} model={bug} onToggle={toggle.bind(this, bug)}></BugItem>
 				));
 
 				return (
 					<div>
-						<BugStats bugs={list}></BugStats>
+						<BugStats bugs={bugs}></BugStats>
 						<section className="edit">
 							<label htmlFor="">New Bug :</label>
 							<input type="text" ref="txtBugName" />
@@ -121,15 +139,16 @@
 								<ol>
 									{bugItems}
 								</ol>
-								<input type="button" value="Remove Closed" onClick={this.onRemoveClosedClick.bind(this)}/>
+								<input type="button" value="Remove Closed" onClick={removeClosed}/>
 							</section>
 						</section>
 					</div>
-				)
+				);
 			}
 		}
 
-		{/*class BugStats extends React.Component{
+		{/*
+		class BugStats extends React.Component{
 			render(){
 				let { bugs } = this.props,
 					closedCount =  bugs.reduce((result, bug) => bug.isClosed ? ++result : result, 0);
@@ -154,31 +173,25 @@
 			)
 		}
 		
-		class BugItem extends React.Component{
-			/*onBugNameClick() {
-				this.props.onToggle();
-			}*/
-			render(){
-				let bug = this.props.model;
-				let bugNameItem = bug.isClosed ? 
-					(<span className="bugname closed" onClick={this.props.onToggle} >{bug.name}</span>) 
-					:(<span className="bugname" onClick={this.props.onToggle} >{bug.name}</span>);
 
-				return (
-					<li>
-						{/*<span className="bugname" onClick={this.onBugNameClick.bind(this)} >{bug.name}</span>*/}
-						{bugNameItem}
-						<div className="datetime">[Created At]</div>
-						<i>[{bug.isClosed.toString()}]</i>
-					</li>
-				);
-			}
+		let BugItem = ({props}) => {
+			let { bug, toggle } = props;
+			let bugClass = bug.isClosed ? 'closed' : '';
+			return (
+				<li>
+					<span className="bugname {bugClass}" onClick={toggle} >{bug.name}</span>
+					<div className="datetime">[Created At]</div>
+					<i>[{bug.isClosed.toString()}]</i>
+				</li>
+			);
 		}
+		
 
 		
 
 		function renderApp(){
-			ReactDOM.render(<BugsList store={store}></BugsList>,
+			let state = store.getState();
+			ReactDOM.render(<BugsList bugs={state} {...actionCreators} ></BugsList>,
 				document.getElementById('content'));
 		}
 		renderApp();
